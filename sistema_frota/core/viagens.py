@@ -13,21 +13,21 @@ class ViagemManager:
             conn.close()
             return
 
-        print("\n--- Veículos ---")
+        print("\n--- Veículos Ativos ---")
         for v in veiculos:
-            print(f"{v[0]} - {v[1]} ({v[2]})")
+            print(f"[{v[0]}] {v[1]} ({v[2]})")
 
-        veiculo_id = input("Escolha o ID do veículo: ")
+        veiculo_id = int(input("Escolha o ID do veículo: "))
 
         # listar motoristas disponíveis
-        cursor.execute("SELECT id, nome, cnh FROM motoristas")
+        cursor.execute("SELECT id, nome, cnh FROM motoristas WHERE ativo = 1")
         motoristas = cursor.fetchall()
         if not motoristas:
             print("❌ Nenhum motorista cadastrado.")
             conn.close()
             return
 
-        print("\n--- Motoristas ---")
+        print("\n--- Motoristas Ativos ---")
         for m in motoristas:
             print(f"{m[0]} - {m[1]} (CNH: {m[2]})")
 
