@@ -1,0 +1,10 @@
+def menu_principal():
+    print("\n=== Sistema de Frota ===")
+    print("1. Cadastrar veículo")
+    print("2. Cadastrar motorista")
+    print("3. Listar veículos")
+    print("4. Listar motoristas")
+    print("5. Registrar viagem")
+    print("6. Listar viagens")
+    print("0. Sair")
+    return input("Escolha uma opção: ")
