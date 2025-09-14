@@ -1,49 +1,26 @@
+"""Módulo de gerenciamento de conexão com o banco de dados do sistema de frota.
+
+Este módulo fornece funcionalidades para estabelecer conexão com o banco de dados
+SQLite utilizado pelo sistema de frota. A conexão é gerenciada de forma centralizada,
+garantindo consistência e reutilização em outras partes do sistema.
+"""
+
 import sqlite3
 
-DB_NAME = "banco_dados.db"
+# Nome do arquivo do banco de dados SQLite
+DB_NAME = "sistema_frota.db"
 
-def get_connection():
+def get_connection() -> sqlite3.Connection:
+    """Estabelece uma conexão com o banco de dados SQLite.
+
+    Cria e retorna uma conexão com o banco de dados especificado pela constante
+    DB_NAME. A conexão é configurada para uso em operações de leitura e escrita.
+
+    Returns:
+        sqlite3.Connection: Objeto de conexão com o banco de dados SQLite.
+
+    Raises:
+        sqlite3.Error: Se houver falha ao conectar ao banco de dados, como
+            permissões insuficientes ou arquivo de banco corrompido.
+    """
     return sqlite3.connect(DB_NAME)
-
-def init_db():
-    conn = get_connection()
-    cursor = conn.cursor()
-
-   # Criar tabela motoristas
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS motoristas (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        cnh TEXT NOT NULL,
-        ativo INTEGER DEFAULT 1
-    )
-    """)
-
-    # Criar tabela veículos
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS veiculos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        placa TEXT NOT NULL,
-        modelo TEXT NOT NULL,
-        ano INTEGER NOT NULL,
-        km INTEGER DEFAULT 0,
-        ativo INTEGER DEFAULT 1
-    )
-    """)
-
-    # tabela de viagens
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS viagens (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        veiculo_id INTEGER NOT NULL,
-        motorista_id INTEGER NOT NULL,
-        destino TEXT NOT NULL,
-        km_rodados INTEGER NOT NULL,
-        data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (veiculo_id) REFERENCES veiculos(id),
-        FOREIGN KEY (motorista_id) REFERENCES motoristas(id)
-    )
-    """)
-
-    conn.commit()
-    conn.close()
