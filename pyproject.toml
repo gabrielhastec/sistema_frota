@@ -1,0 +1,55 @@
+# Configuração do projeto sistema_frota para instalação e distribuição.
+#
+# Este arquivo define os metadados do projeto, dependências e configurações de build
+# conforme as PEPs 518 e 621, utilizando setuptools como ferramenta de build.
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sistema_frota"
+version = "1.0.0"
+authors = [
+    { name = "Gabriel Hastec", email = "gabrielhastec.dev@gmail.com" },
+]
+description = "Sistema para gerenciamento de frota com motoristas, veículos e viagens."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.8"
+keywords = ["frota", "motoristas", "veículos", "viagens", "sqlite", "gerenciamento"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Database :: Front-Ends",
+    "Environment :: Console",
+]
+dependencies = []
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+dev = [
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+]
+
+[project.scripts]
+sistema-frota = "examples.main:main"
+
+[project.urls]
+Homepage = "https://github.com/gabrielhastec/sistema_frota"
+Repository = "https://github.com/gabrielhastec/sistema_frota"
+Issues = "https://github.com/gabrielhastec/sistema_frota/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["tests", "tests.*", "examples"]
+
+[tool.setuptools]
+include-package-data = true
