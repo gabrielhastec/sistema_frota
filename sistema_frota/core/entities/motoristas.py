@@ -1,89 +1,69 @@
-from db.database import get_connection
+"""Módulo para gerenciamento de motoristas.
 
-class MotoristaManager:
+Este módulo define a classe Motorista, que representa um motorista com informações
+básicas como identificador, nome, CNH e status de ativação. Ele fornece métodos
+para ativar e desativar o motorista, além de consultar suas informações.
+"""
 
-    def cadastrar(self):
-        nome = input("Nome: ")
-        cnh = input("CNH: ")
-        telefone = input("Telefone: ")
+class Motorista:
+    """Representa um motorista com informações básicas e status de ativação.
 
-        conn = get_connection()
-        cursor = conn.cursor()
+    Atributos:
+        motorista_id (int): Identificador único do motorista.
+        nome (str): Nome completo do motorista.
+        cnh (str): Número da Carteira Nacional de Habilitação.
+        ativo (bool): Indica se o motorista está ativo (padrão: True).
+    """
 
-        try:
-            cursor.execute(
-                "INSERT INTO motoristas (nome, cnh, telefone) VALUES (?, ?, ?)",
-                (nome, cnh, telefone),
-            )
-            conn.commit()
-            print(f"✅ Motorista {nome} cadastrado com sucesso!")
-        except Exception as e:
-            print(f"Erro: {e}")
-        finally:
-            conn.close()
+    def __init__(self, motorista_id: int, nome: str, cnh: str, ativo: bool = True):
+        """Inicializa uma nova instância da classe Motorista.
 
-    def listar(self, incluir_inativos=False):
-        conn = get_connection()
-        cursor = conn.cursor()
+        Args:
+            motorista_id (int): Identificador único do motorista.
+            nome (str): Nome completo do motorista.
+            cnh (str): Número da Carteira Nacional de Habilitação.
+            ativo (bool, opcional): Status de ativação do motorista. Padrão é True.
 
-        if incluir_inativos:
-            cursor.execute("SELECT nome, cnh, telefone, ativo FROM motoristas")
-        else:
-            cursor.execute("SELECT nome, cnh, telefone FROM motoristas WHERE ativo = 1")
-        motoristas = cursor.fetchall()
-        conn.close()
+        Raises:
+            ValueError: Se motorista_id for negativo ou se nome ou cnh forem vazios.
+        """
+        if motorista_id < 0:
+            raise ValueError("O ID do motorista não pode ser negativo.")
+        if not nome.strip():
+            raise ValueError("O nome do motorista não pode ser vazio.")
+        if not cnh.strip():
+            raise ValueError("A CNH do motorista não pode ser vazia.")
 
-        if not motoristas:
-            print("Nenhum motorista cadastrado.")
-        else:
-            print("\n--- Motoristas ---")
-            for m in motoristas:
-                status = "Ativo" if m[4] == 1 else "Inativo"
-                print(f"[{m[0]}] {m[1]} - CNH: {m[2]} - Tel: {m[3]} - Status: {status}")
+        self.motorista_id = motorista_id
+        self.nome = nome
+        self.cnh = cnh
+        self.ativo = ativo
 
-        conn.close()
+    def desativar(self):
+        """Desativa o motorista, alterando seu status para inativo.
 
-    def desativar(self, motorista_id):
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute("UPDATE motoristas SET ativo = 0 WHERE id = ?", (motorista_id,))
-        conn.commit()
-        conn.close()
-        print(f"🚫 Motorista ID {motorista_id} desativado.")
+        Returns:
+            None
+        """
+        self.ativo = False
 
-    def ativar(self, motorista_id):
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute("UPDATE motoristas SET ativo = 1 WHERE id = ?", (motorista_id,))
-        conn.commit()
-        conn.close()
-        print(f"✅ Motorista ID {motorista_id} reativado.")
+    def ativar(self):
+        """Ativa o motorista, alterando seu status para ativo.
 
-    def editar(self, motorista_id):
-        conn = get_connection()
-        cursor = conn.cursor()
+        Returns:
+            None
+        """
+        self.ativo = True
 
-        cursor.execute("SELECT nome, cnh, telefone FROM motoristas WHERE id = ?", (motorista_id,))
-        motorista = cursor.fetchone()
-        if not motorista:
-            print("❌ Motorista não encontrado.")
-            conn.close()
-            return
+    def obter_informacoes(self):
+        """Retorna as informações do motorista em formato de dicionário.
 
-        print(f"Editando Motorista ID {motorista_id}:")
-        novo_nome = input(f"Nome ({motorista[0]}): ") or motorista[0]
-        nova_cnh = input(f"CNH ({motorista[1]}): ") or motorista[1]
-        novo_telefone = input(f"Telefone ({motorista[2]}): ") or motorista[2]
-
-        try:
-            cursor.execute("""
-                UPDATE motoristas
-                SET nome = ?, cnh = ?, telefone = ?
-                WHERE id = ?
-            """, (novo_nome, nova_cnh, novo_telefone, motorista_id))
-            conn.commit()
-            print("✅ Motorista atualizado com sucesso!")
-        except Exception as e:
-            print(f"Erro: {e}")
-        finally:
-            conn.close()
+        Returns:
+            dict: Dicionário contendo motorista_id, nome, cnh e status ativo.
+        """
+        return {
+            "motorista_id": self.motorista_id,
+            "nome": self.nome,
+            "cnh": self.cnh,
+            "ativo": self.ativo
+        }

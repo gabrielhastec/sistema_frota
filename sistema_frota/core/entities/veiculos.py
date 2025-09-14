@@ -1,62 +1,103 @@
-from db.database import get_connection
+"""Módulo para gerenciamento de veículos.
 
-class VeiculoManager:
+Este módulo define a classe Veiculo, que representa um veículo com informações
+como identificador, placa, modelo, ano, quilometragem e status de ativação.
+Fornece métodos para atualizar a quilometragem, ativar e desativar o veículo,
+além de consultar suas informações.
+"""
 
-    def cadastrar(self):
-        placa = input("Placa: ")
-        modelo = input("Modelo: ")
-        ano = input("Ano: ")
-        km = input("Quilometragem inicial: ")
+class Veiculo:
+    """Representa um veículo com informações básicas e status de ativação.
 
-        conn = get_connection()
-        cursor = conn.cursor()
+    Atributos:
+        veiculo_id (int): Identificador único do veículo.
+        placa (str): Placa do veículo.
+        modelo (str): Modelo do veículo.
+        ano (int): Ano de fabricação do veículo.
+        km (float): Quilometragem atual do veículo.
+        ativo (bool): Indica se o veículo está ativo (padrão: True).
+    """
 
-        try:
-            cursor.execute(
-                "INSERT INTO veiculos (placa, modelo, ano, km) VALUES (?, ?, ?, ?)",
-                (placa, modelo, ano, km),
-            )
-            conn.commit()
-            print(f"✅ Veículo {placa} cadastrado com sucesso!")
-        except Exception as e:
-            print(f"Erro: {e}")
-        finally:
-            conn.close()
+    def __init__(self, veiculo_id: int, placa: str, modelo: str, ano: int, km: float = 0, ativo: bool = True):
+        """Inicializa uma nova instância da classe Veiculo.
 
-    def listar(self):
-        conn = get_connection()
-        cursor = conn.cursor()
+        Args:
+            veiculo_id (int): Identificador único do veículo.
+            placa (str): Placa do veículo.
+            modelo (str): Modelo do veículo.
+            ano (int): Ano de fabricação do veículo.
+            km (float, opcional): Quilometragem inicial do veículo. Padrão é 0.
+            ativo (bool, opcional): Status de ativação do veículo. Padrão é True.
 
-        if incluir_inativos:
-            cursor.execute("SELECT placa, modelo, ano, km, ativo FROM veiculos")
-        else:
-            cursor.execute("SELECT placa, modelo, ano, km FROM veiculos WHERE ativo = 1")
-        veiculos = cursor.fetchall()
-        conn.close()
+        Raises:
+            ValueError: Se veiculo_id for negativo, placa ou modelo forem vazios,
+                        ano for inválido (menor que 1900 ou maior que o ano atual),
+                        ou km for negativo.
+        """
+        from datetime import datetime
+        current_year = datetime.now().year
 
-        if not veiculos:
-            print("Nenhum veículo cadastrado.")
-        else:
-            print("\n--- Veículos ---")
-            for v in veiculos:
-                status = "Ativo" if v[5] == 1 else "Inativo"
-                print(f"[{v[0]}] {v[1]} - {v[2]} ({v[3]}) - {v[4]} km ({status})")
+        if veiculo_id < 0:
+            raise ValueError("O ID do veículo não pode ser negativo.")
+        if not placa.strip():
+            raise ValueError("A placa do veículo não pode ser vazia.")
+        if not modelo.strip():
+            raise ValueError("O modelo do veículo não pode ser vazio.")
+        if ano < 1900 or ano > current_year:
+            raise ValueError(f"O ano deve estar entre 1900 e {current_year}.")
+        if km < 0:
+            raise ValueError("A quilometragem não pode ser negativa.")
 
-        conn.close()
+        self.veiculo_id = veiculo_id
+        self.placa = placa
+        self.modelo = modelo
+        self.ano = ano
+        self.km = km
+        self.ativo = ativo
 
-    def desativar(self, veiculo_id):
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute("UPDATE veiculos SET ativo = 0 WHERE id = ?", (veiculo_id,))
-        conn.commit()
-        conn.close()
-        print(f"🚫 Veículo ID {veiculo_id} desativado.")
+    def atualizar_km(self, km: float):
+        """Atualiza a quilometragem do veículo.
 
-    def ativar(self, veiculo_id):
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute("UPDATE veiculos SET ativo = 1 WHERE id = ?", (veiculo_id,))
-        conn.commit()
-        conn.close()
-        print(f"✅ Veículo ID {veiculo_id} reativado.")
-        
+        Args:
+            km (float): Nova quilometragem do veículo.
+
+        Raises:
+            ValueError: Se a quilometragem fornecida for negativa.
+
+        Returns:
+            None
+        """
+        if km < 0:
+            raise ValueError("A quilometragem não pode ser negativa.")
+        self.km = km
+
+    def desativar(self):
+        """Desativa o veículo, alterando seu status para inativo.
+
+        Returns:
+            None
+        """
+        self.ativo = False
+
+    def ativar(self):
+        """Ativa o veículo, alterando seu status para ativo.
+
+        Returns:
+            None
+        """
+        self.ativo = True
+
+    def obter_informacoes(self):
+        """Retorna as informações do veículo em formato de dicionário.
+
+        Returns:
+            dict: Dicionário contendo veiculo_id, placa, modelo, ano, km e status ativo.
+        """
+        return {
+            "veiculo_id": self.veiculo_id,
+            "placa": self.placa,
+            "modelo": self.modelo,
+            "ano": self.ano,
+            "km": self.km,
+            "ativo": self.ativo
+        }
