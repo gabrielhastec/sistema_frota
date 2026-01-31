@@ -5,8 +5,16 @@ Define a entidade Veiculo, responsável por representar um veículo,
 seu hodômetro atual e o histórico de manutenções realizadas.
 """
 
-from typing import List
-from app.domain.entities.manutencao import Manutencao
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import List, Optional, Dict
+from uuid import UUID, uuid4
+
+from ..value_objects.veiculo.manutencao import Manutencao
+from ..value_objects.veiculo.placa import Placa
+from ..value_objects.veiculo.tipo_combustivel import TipoCombustivel
+from ..value_objects.veiculo.tipo_veiculo import TipoVeiculo
+from ..events.veiculo.manutencao_necessaria import ManutencaoNecessaria, TipoManutencao
 
 class Veiculo:
     """
